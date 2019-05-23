@@ -13,7 +13,10 @@ Some details may be different from the original paper, welcome to discuss and he
 | My Small     | 65  M     | 3.1  M     | 69.069%   |
 
   The mobilenetv3.py is fork from https://github.com/xiaolai-sqlai/mobilenetv3
-  But there is some different implement details from the original paper setting. Like the SeModule, and the last few layers of fc, the paper didn't use Batch Norm, but this implemented add BN in the code.
+  But there is some different implement details from the original paper setting. 
+  Like the SeModule, and the last few layers of fc, the paper didn't use Batch Norm, but this implemented add BN in the code.
 
-  So, i re-implemented the MobileNetV3 in detailed. See mobilenetv3_version2.py for more detailed information.
-  You can compare the mobilenetv3_version2.py with mobilenetv3.py. The output is the same. You can just run the py file without other third part lib or package.
+  So, I re-implemented the MobileNetV3 in detailed. See mobilenetv3_version2.py for more detailed information.
+  
+  You can compare the mobilenetv3_version2.py with mobilenetv3.py. 
+  The output is the same. You can just run the py file without other third part lib or package.
