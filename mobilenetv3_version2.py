@@ -179,9 +179,10 @@ class MobileNetV3(nn.Module):
         elif mode == 'small':
             last_conv = make_divisible(576 * width_mult)
             self.features.append(conv_1x1_bn(input_channel, last_conv, nlin_layer=HSwish))
-            self.features.append(SEModule(last_channel))
+            self.features.append(SEModule(last_conv))
             self.features.append(nn.AdaptiveAvgPool2d(1))
             # self.features.append(HSwish(inplace=True))
+            # we don't need bn here. Just conv2d and HS here.
             self.features.append(nn.Conv2d(last_conv, last_channel, 1, 1, 0))
             self.features.append(HSwish(inplace=True))
             self.features.append(nn.Conv2d(last_channel, n_class, 1, 1, 0))
@@ -209,7 +210,8 @@ class MobileNetV3(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
-        x = x.mean(3).mean(2)
+        x = x.squeeze(3).squeeze(2)
+        # x = x.mean(3).mean(2)   # the same as squeeze
         return x
 
 
@@ -222,4 +224,10 @@ def mobilenetv3(pretrained=False, **kwargs):
 
 if __name__ == '__main__':
     net = mobilenetv3(mode='small')
-
+    print('mobilenetv3:\n', net)
+    print('Total params: %.2fM' % (sum(p.numel() for p in net.parameters())/1000000.0))
+    input_size = (16, 3, 224, 224)
+    x = torch.randn(input_size)
+    out = net(x)
+    print(out)
+    print(out.size())
