@@ -21,7 +21,7 @@ class hsigmoid(nn.Module):
         out = F.relu6(x + 3, inplace=True) / 6
         return out
 
-
+# there is something different from the paper's implement details. see paper's Figure4
 class SeModule(nn.Module):
     def __init__(self, in_size, reduction=4):
         super(SeModule, self).__init__()
@@ -128,6 +128,7 @@ class MobileNetV3_Large(nn.Module):
         out = self.hs2(self.bn2(self.conv2(out)))
         out = F.avg_pool2d(out, 7)
         out = out.view(out.size(0), -1)
+         # there is no BN in table 1.
         out = self.hs3(self.bn3(self.linear3(out)))
         out = self.linear4(out)
         return out
@@ -185,6 +186,7 @@ class MobileNetV3_Small(nn.Module):
         out = self.hs2(self.bn2(self.conv2(out)))
         out = F.avg_pool2d(out, 7)
         out = out.view(out.size(0), -1)
+        # there is no BN in table 2.
         out = self.hs3(self.bn3(self.linear3(out)))
         out = self.linear4(out)
         return out
