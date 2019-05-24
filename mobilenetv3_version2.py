@@ -170,9 +170,9 @@ class MobileNetV3(nn.Module):
         # building last several layers.
         if mode == 'large':
             last_conv = make_divisible(960 * width_mult)
-            self.features.append(conv_1x1_bn(input_channel, last_channel, nlin_layer=HSwish))
+            self.features.append(conv_1x1_bn(input_channel, last_conv, nlin_layer=HSwish))
             self.features.append(nn.AdaptiveAvgPool2d(1))
-            self.features.append(HSwish(inplace=True))
+#             self.features.append(HSwish(inplace=True))
             self.features.append(nn.Conv2d(last_conv, last_channel, 1, 1, 0))
             self.features.append(HSwish(inplace=True))
             self.features.append(nn.Conv2d(last_channel, n_class, 1, 1, 0))
@@ -182,7 +182,7 @@ class MobileNetV3(nn.Module):
             self.features.append(SEModule(last_conv))
             self.features.append(nn.AdaptiveAvgPool2d(1))
             # self.features.append(HSwish(inplace=True))
-            # we don't need bn here. Just conv2d and HS here.
+            # we don't need BN here. Just conv2d and HS here.
             self.features.append(nn.Conv2d(last_conv, last_channel, 1, 1, 0))
             self.features.append(HSwish(inplace=True))
             self.features.append(nn.Conv2d(last_channel, n_class, 1, 1, 0))
