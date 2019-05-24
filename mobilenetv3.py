@@ -58,19 +58,25 @@ class Block(nn.Module):
         
         self.use_res_connect = stride == 1 and in_size == out_size
         
-        self.shortcut = nn.Sequential()
-        if stride == 1 and in_size != out_size:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(in_size, out_size, kernel_size=1, stride=1, padding=0, bias=False),
-                nn.BatchNorm2d(out_size),
-            )
+#         self.shortcut = nn.Sequential()
+#         if stride == 1 and in_size != out_size:
+#             self.shortcut = nn.Sequential(
+#                 nn.Conv2d(in_size, out_size, kernel_size=1, stride=1, padding=0, bias=False),
+#                 nn.BatchNorm2d(out_size),
+#             )
 
     def forward(self, x):
         out = self.nolinear1(self.bn1(self.conv1(x)))
-        out = self.nolinear2(self.bn2(self.conv2(out)))
-        out = self.bn3(self.conv3(out))
-        if self.se != None:
+        out = self.bn2(self.conv2(out))
+        if self.se is not None:
             out = self.se(out)
+        out = self.nolinear2(out)
+        out = self.bn3(self.conv3(out))
+        
+#         out = self.nolinear2(self.bn2(self.conv2(out)))
+#         out = self.bn3(self.conv3(out))
+#         if self.se != None:
+#             out = self.se(out)
         out = out + x if self.use_res_connect else out
 #         out = out + self.shortcut(x) if self.stride==1 else out
         return out
@@ -87,18 +93,18 @@ class MobileNetV3_Large(nn.Module):
             Block(3, 16, 16, 16, nn.ReLU(inplace=True), None, 1),
             Block(3, 16, 64, 24, nn.ReLU(inplace=True), None, 2),
             Block(3, 24, 72, 24, nn.ReLU(inplace=True), None, 1),
-            Block(5, 24, 72, 40, nn.ReLU(inplace=True), SeModule(40), 2),
-            Block(5, 40, 120, 40, nn.ReLU(inplace=True), SeModule(40), 1),
-            Block(5, 40, 120, 40, nn.ReLU(inplace=True), SeModule(40), 1),
+            Block(5, 24, 72, 40, nn.ReLU(inplace=True), SeModule(72), 2),
+            Block(5, 40, 120, 40, nn.ReLU(inplace=True), SeModule(120), 1),
+            Block(5, 40, 120, 40, nn.ReLU(inplace=True), SeModule(120), 1),
             Block(3, 40, 240, 80, hswish(), None, 2),
             Block(3, 80, 200, 80, hswish(), None, 1),
             Block(3, 80, 184, 80, hswish(), None, 1),
             Block(3, 80, 184, 80, hswish(), None, 1),
-            Block(3, 80, 480, 112, hswish(), SeModule(112), 1),
-            Block(3, 112, 672, 112, hswish(), SeModule(112), 1),
-            Block(5, 112, 672, 160, hswish(), SeModule(160), 1),
-            Block(5, 160, 672, 160, hswish(), SeModule(160), 2),
-            Block(5, 160, 960, 160, hswish(), SeModule(160), 1),
+            Block(3, 80, 480, 112, hswish(), SeModule(480), 1),
+            Block(3, 112, 672, 112, hswish(), SeModule(672), 1),
+            Block(5, 112, 672, 160, hswish(), SeModule(672), 1),
+            Block(5, 160, 672, 160, hswish(), SeModule(672), 2),
+            Block(5, 160, 960, 160, hswish(), SeModule(960), 1),
         )
 
 
@@ -132,7 +138,7 @@ class MobileNetV3_Large(nn.Module):
         out = F.avg_pool2d(out, 7)
         out = out.view(out.size(0), -1)
          # there is no BN in table 1.
-        out = self.hs3(self.bn3(self.linear3(out)))
+        out = self.hs3(self.linear3(out))
         out = self.linear4(out)
         return out
 
@@ -149,14 +155,14 @@ class MobileNetV3_Small(nn.Module):
             Block(3, 16, 16, 16, nn.ReLU(inplace=True), SeModule(16), 2),
             Block(3, 16, 72, 24, nn.ReLU(inplace=True), None, 2),
             Block(3, 24, 88, 24, nn.ReLU(inplace=True), None, 1),
-            Block(5, 24, 96, 40, hswish(), SeModule(40), 2),
-            Block(5, 40, 240, 40, hswish(), SeModule(40), 1),
-            Block(5, 40, 240, 40, hswish(), SeModule(40), 1),
-            Block(5, 40, 120, 48, hswish(), SeModule(48), 1),
-            Block(5, 48, 144, 48, hswish(), SeModule(48), 1),
-            Block(5, 48, 288, 96, hswish(), SeModule(96), 2),
-            Block(5, 96, 576, 96, hswish(), SeModule(96), 1),
-            Block(5, 96, 576, 96, hswish(), SeModule(96), 1),
+            Block(5, 24, 96, 40, hswish(), SeModule(96), 2),
+            Block(5, 40, 240, 40, hswish(), SeModule(240), 1),
+            Block(5, 40, 240, 40, hswish(), SeModule(240), 1),
+            Block(5, 40, 120, 48, hswish(), SeModule(120), 1),
+            Block(5, 48, 144, 48, hswish(), SeModule(144), 1),
+            Block(5, 48, 288, 96, hswish(), SeModule(288), 2),
+            Block(5, 96, 576, 96, hswish(), SeModule(576), 1),
+            Block(5, 96, 576, 96, hswish(), SeModule(576), 1),
         )
 
 
@@ -190,7 +196,7 @@ class MobileNetV3_Small(nn.Module):
         out = F.avg_pool2d(out, 7)
         out = out.view(out.size(0), -1)
         # there is no BN in table 2.
-        out = self.hs3(self.bn3(self.linear3(out)))
+        out = self.hs3(self.linear3(out))
         out = self.linear4(out)
         return out
 
