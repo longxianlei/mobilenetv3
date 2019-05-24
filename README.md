@@ -15,11 +15,13 @@ Some details may be different from the original paper, welcome to discuss and he
 ```
 mobilenetv3.py
 ```
-  The "mobilenetv3.py" is fork from https://github.com/xiaolai-sqlai/mobilenetv3
+  The "mobilenetv3.py" is fork from https://github.com/xiaolai-sqlai/mobilenetv3, but I change some detailed of the module. 
   
   But there are some different implement details between the original paper setting and the personal one's. 
   
   Like the SeModule, and the last few layers of fc, the paper didn't use Batch Norm, but this implemented add BN in the code.
+  
+  So, I change the code to accordance with the original paper described. The SeModule and the two FC layers do not use res-connect.
   
 ```
 mobilenetv3_version2.py
