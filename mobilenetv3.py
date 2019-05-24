@@ -55,7 +55,9 @@ class Block(nn.Module):
         self.nolinear2 = nolinear
         self.conv3 = nn.Conv2d(expand_size, out_size, kernel_size=1, stride=1, padding=0, bias=False)
         self.bn3 = nn.BatchNorm2d(out_size)
-
+        
+        self.use_res_connect = stride == 1 and in_size == out_size
+        
         self.shortcut = nn.Sequential()
         if stride == 1 and in_size != out_size:
             self.shortcut = nn.Sequential(
@@ -69,7 +71,8 @@ class Block(nn.Module):
         out = self.bn3(self.conv3(out))
         if self.se != None:
             out = self.se(out)
-        out = out + self.shortcut(x) if self.stride==1 else out
+        out = out + x if self.use_res_connect else out
+#         out = out + self.shortcut(x) if self.stride==1 else out
         return out
 
 
@@ -200,3 +203,5 @@ def test():
     print(y.size())
 
 # test()
+if __name__ == '__main__':
+    test()
