@@ -21,7 +21,7 @@ mobilenetv3.py
   
   Like the SeModule, and the last few layers of fc, the paper didn't use Batch Norm, but this implemented add BN in the code.
   
-  So, I change the code to accordance with the original paper described. The SeModule and the two FC layers do not use res-connect.
+  So, I change the code to accordance with the original paper described. The SeModule and the two FC layers do not use BN.
   
 ```
 mobilenetv3_version2.py
